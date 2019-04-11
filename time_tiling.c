@@ -5,22 +5,20 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <cilk/cilk.h>
+//#include <cilk/cilk.h>
 #include "xmmintrin.h"
 #include "pmmintrin.h"
 #include "tiled_buffer.h"
 
 //#define min(a, b) (((a) < (b)) ? (a) : (b))
 
-
-
-
-
 int main(int argc, char **argv) {
     //int nrows = atoi(argv[1]);  //Number of rows
     //int ncols = atoi(argv[2]);  //Number of columns
     //int timesteps = atoi(argv[3]); //Number of timsteps
     int tile_size = atoi(argv[1]); // Size of tile (space and time)
+    int num_threads = atoi(argv[2]); // Size of tile (space and time)
+
     int print_results = 0;    // Print a segment of the calculations
     int si = 10; int ei = 15; int sc = 10; int ec = 15; // Bounds of the segment
 
@@ -34,6 +32,11 @@ int main(int argc, char **argv) {
     struct timeval t1, t2;
     double elapsedTime1, elapsedTime2;
 		double sum_elapsedTime1, sum_elapsedTime2;
+
+    omp_set_num_threads(num_threads);
+    /* Flush denormal numbers to zero in hardware */
+    _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+    _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 
     //printf("Problem setup is \nnrows: %d\nncols: %d\nTimesteps: %d\nTimestamps: %d\n",nrows, ncols, timesteps, timestamps);
 
@@ -51,20 +54,20 @@ int main(int argc, char **argv) {
 		double ** RESULTS;
     malloc2d(&RESULTS, 40, 10);
 
-		int validation_iters = 10;
+		int validation_iters = 20;
 		int ri=-1; int rj=0;
-		for(int rows_pow = 9 ; rows_pow < 12; rows_pow++){
+		for(int rows_pow = 8 ; rows_pow < 13; rows_pow++){
 			//for(int cols_pow = 5 ; cols_pow< 11; cols_pow++){
 //ri++;
-			for(int time_pow = 2 ; time_pow < 6; time_pow++){
-ri++;
+			for(int time_pow = 2 ; time_pow < 8; time_pow++){
+        int nrows = pow( 2 ,  rows_pow);
+  			int ncols = pow( 2 ,  rows_pow);
+  			int timesteps = pow( 2 ,  time_pow);
+  			int timestamps = timesteps;     // To be removed after implementing buffering
+  			int timestamps2 = timesteps;    // To be removed after implementing buffering
+      if (pow( 2 ,  2*rows_pow)*timesteps < pow( 2 ,  27) ){
+      ri++;
 
-
-			int nrows = pow( 2 ,  rows_pow);
-			int ncols = pow( 2 ,  rows_pow);
-			int timesteps = pow( 2 ,  time_pow);
-			int timestamps = timesteps;     // To be removed after implementing buffering
-			int timestamps2 = timesteps;    // To be removed after implementing buffering
 
 			RESULTS[ri][0] = nrows;
 			RESULTS[ri][1] = timesteps;
@@ -77,9 +80,7 @@ ri++;
     double *** u2;
     u2 = createMatrix(nrows, ncols, timestamps2);
 
-    /* Flush denormal numbers to zero in hardware */
-    _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
-    _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+
 
 		sum_elapsedTime1 = 0 ;
 		sum_elapsedTime2 = 0;
@@ -126,7 +127,7 @@ if(validate_flag){
     //for (int k = 0; k < timestamps; k++) {
         for (int i = 0; i < nrows; i++) {
           for (int j = 0; j < ncols; j++) {
-          if ((u[i][j][timesteps-1] - u2[i][j][timesteps-1])> 0.001) {
+          if ((u[i][j][timesteps-1] - u2[i][j][timesteps-1])> 0.00001) {
             printf(" Failed %d, %d %f \n",i, j,(u[i][j][timesteps-1] - u2[i][j][timesteps-1]));
           }
         }
@@ -162,7 +163,7 @@ if(print_results){
 
 	}//rows_pow
 //}//cols_pow
-
+}//if
 }//time_pow
 
 if(1){
@@ -175,9 +176,10 @@ if(1){
   }
 }
 
-char str[100];
-printf("\n Enter the filename :");
-gets(str);
+char str[100] = "Results";
+//printf("\n Enter the filename :");
+//gets(str);
+
 create_results_csv(str, RESULTS, 6, 20);
     return 0;
 }

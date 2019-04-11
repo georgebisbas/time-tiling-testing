@@ -1,6 +1,6 @@
 all: time_tiling
 
-CC = icc
+CC = gcc #icc
 DEPS = tile_auxiliary.h
 
 
