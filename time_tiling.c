@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
 
 		int validation_iters = 10;
 		int ri=-1; int rj=0;
-		for(int rows_pow = 9 ; rows_pow < 13; rows_pow++){
+		for(int rows_pow = 9 ; rows_pow < 12; rows_pow++){
 			//for(int cols_pow = 5 ; cols_pow< 11; cols_pow++){
 //ri++;
 			for(int time_pow = 2 ; time_pow < 6; time_pow++){
@@ -174,5 +174,10 @@ if(1){
     }
   }
 }
+
+char str[100];
+printf("\n Enter the filename :");
+gets(str);
+create_results_csv(str, RESULTS, 6, 20);
     return 0;
 }

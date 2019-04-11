@@ -3,7 +3,7 @@
 #include<stdio.h>
 #include<string.h>
 
-void create_results_csv(char *filename,int a[][10],int n,int m){
+void create_results_csv(char *filename, double **a,int n,int m){
 printf("\n Creating %s.csv file",filename);
 FILE *fp;
 int i,j;
@@ -13,7 +13,7 @@ fprintf(fp,"NROWS, NCOLS, Timesteps, Tilesize, el1, el2, speedup");
 for(i=0;i<m;i++){
     fprintf(fp,"\n%d",i+1);
     for(j=0;j<n;j++)
-        fprintf(fp,",%d ",a[i][j]);
+        fprintf(fp,", %f ",a[i][j]);
     }
 fclose(fp);
 printf("\n %sfile created",filename);
