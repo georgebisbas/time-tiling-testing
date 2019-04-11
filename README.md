@@ -1,2 +1,2 @@
 # time-tiling-testing
-A repository to test loop nesto optimizations and particularly time-tiling
+A repository to test loop nest optimizations and particularly time-tiling
