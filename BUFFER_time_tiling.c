@@ -56,10 +56,10 @@ int main(int argc, char **argv) {
 
 		int validation_iters = 5;
 		int ri=-1; int rj=0;
-		for(int rows_pow = 12 ; rows_pow < 13; rows_pow++){
+		for(int rows_pow = 7 ; rows_pow < 10; rows_pow++){
 			//for(int cols_pow = 5 ; cols_pow< 11; cols_pow++){
 //ri++;
-			for(int time_pow = 5 ; time_pow < 6; time_pow++){
+			for(int time_pow = 5 ; time_pow < 9; time_pow++){
         int nrows = pow( 2 ,  rows_pow);
   			int ncols = pow( 2 ,  rows_pow);
   			int timesteps = pow( 2 ,  time_pow);
@@ -106,7 +106,7 @@ for(int validation_index=0; validation_index<validation_iters;validation_index++
 
     //printf("Starting Jacobi...");
 		gettimeofday(&t1, NULL);
-    u2 = tiled_skewed_jacobi_3d(timesteps, nrows, ncols, u2, omp_opt=0,tile_size);
+    u2 = tiled_skewed_buffered(timesteps, nrows, ncols, u2, omp_opt=0,tile_size);
     gettimeofday(&t2, NULL);
     //printf("... Finished \n");
     elapsedTime2 = (double)(t2.tv_sec-t1.tv_sec)+(double)(t2.tv_usec-t1.tv_usec)/1000000;
@@ -148,10 +148,6 @@ for(int validation_index=0; validation_index<validation_iters;validation_index++
         }
       }
     }
-
-
-
-
 
 }
 

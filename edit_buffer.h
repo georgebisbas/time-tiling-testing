@@ -137,7 +137,7 @@ double ** * tiled_skewed_jacobi_3d(int timesteps, int nrows, int ncols, double *
 
 
 
-double ** * tiled_skewed_buffer_jacobi_3d(int timesteps, int nrows, int ncols, double ** * grid, int omp_opt, int tile_size) {
+double ** * tiled_skewed_buffered(int timesteps, int nrows, int ncols, double ** * grid, int omp_opt, int tile_size) {
   int t = 0;
   int xi = 0;
   int yi = 0;
