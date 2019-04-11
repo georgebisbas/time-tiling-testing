@@ -8,8 +8,8 @@
 //#include <cilk/cilk.h>
 #include "xmmintrin.h"
 #include "pmmintrin.h"
-#include "tiled_buffer.h"
-
+//#include "tiled_buffer.h"
+#include "edit_buffer.h"
 //#define min(a, b) (((a) < (b)) ? (a) : (b))
 
 int main(int argc, char **argv) {
@@ -54,18 +54,21 @@ int main(int argc, char **argv) {
 		double ** RESULTS;
     malloc2d(&RESULTS, 40, 10);
 
-		int validation_iters = 20;
+		int validation_iters = 5;
 		int ri=-1; int rj=0;
-		for(int rows_pow = 8 ; rows_pow < 9; rows_pow++){
+		for(int rows_pow = 12 ; rows_pow < 13; rows_pow++){
 			//for(int cols_pow = 5 ; cols_pow< 11; cols_pow++){
 //ri++;
-			for(int time_pow = 2 ; time_pow < 8; time_pow++){
+			for(int time_pow = 5 ; time_pow < 6; time_pow++){
         int nrows = pow( 2 ,  rows_pow);
   			int ncols = pow( 2 ,  rows_pow);
   			int timesteps = pow( 2 ,  time_pow);
-  			int timestamps = timesteps;     // To be removed after implementing buffering
-  			int timestamps2 = timesteps;    // To be removed after implementing buffering
-      if (pow( 2 ,  2*rows_pow)*timesteps < pow( 2 ,  27) ){
+
+  			int timestamps = 2;     // To be removed after implementing buffering
+  			int timestamps2 = 2;    // To be removed after implementing buffering
+
+
+      if (pow( 2 ,  2*rows_pow)*2 < pow( 2 ,  32) ){
       ri++;
 
 
@@ -75,18 +78,22 @@ int main(int argc, char **argv) {
 
 		printf("Problem setup is \nnrows: %d\nncols: %d\nTimesteps: %d\nTimestamps: %d\n", nrows, ncols, timesteps, timestamps);
 
+
+
+    //printf("Allocated\n");
+
+
+		sum_elapsedTime1 = 0 ;
+		sum_elapsedTime2 = 0;
     double *** u;
     u = createMatrix(nrows, ncols, timestamps);
     double *** u2;
     u2 = createMatrix(nrows, ncols, timestamps2);
 
 
-
-		sum_elapsedTime1 = 0 ;
-		sum_elapsedTime2 = 0;
-
 for(int validation_index=0; validation_index<validation_iters;validation_index++){
-    initialize3(nrows, ncols,timestamps, u);
+
+    initialize3(nrows, ncols, timestamps, u);
     initialize3(nrows, ncols, timestamps2, u2);
 
     //printf("\n Starting Jacobi...");
@@ -108,57 +115,57 @@ for(int validation_index=0; validation_index<validation_iters;validation_index++
     printf(" Speedup from skeweing is : %3.3f\n", elapsedTime1/elapsedTime2);
 		sum_elapsedTime1 += elapsedTime1;
 		sum_elapsedTime2 += elapsedTime2;
+
+    int validate_flag=1;
+    if(validate_flag){
+        //for (int k = 0; k < timestamps; k++) {
+            for (int i = 0; i < nrows; i++) {
+              for (int j = 0; j < ncols; j++) {
+              if ((u[i][j][1] - u2[i][j][1])> 0.00001) {
+                printf(" Failed %d, %d %f \n",i, j,(u[i][j][1] - u2[i][j][1]));
+              }
+            }
+          }
+        //}
+    }
+
+    if(print_results){
+      printf("\n ------------------------\n");
+        for (int i = si; i < ei; i++) {
+          printf("\n");
+          for (int j = sc; j < ec; j++) {
+          printf(" %3.3f", u[i][j][1]);
+        }
+      }
+    }
+
+    if(print_results){
+      printf("\n ------------------------\n");
+        for (int i = si; i < ei; i++) {
+          printf("\n");
+          for (int j = sc; j < ec; j++) {
+          printf(" %3.3f", u2[i][j][1]);
+        }
+      }
+    }
+
+
+
+
+
 }
 
 RESULTS[ri][3] = sum_elapsedTime1/validation_iters;
 RESULTS[ri][4] = sum_elapsedTime2/validation_iters;
 RESULTS[ri][5] = sum_elapsedTime1/sum_elapsedTime2;
 
-
-
 printf("Problem setup is \nnrows: %d\nncols: %d\nTimesteps: %d\nTimestamps: %d\n",nrows, ncols, timesteps, timestamps);
 printf(" Average speedup from skeweing is : %3.3f\n", sum_elapsedTime1/sum_elapsedTime2);
-//RESULTS[5][5]= sum_elapsedTime1/sum_elapsedTime2;
+
+free(u);
+free(u2);
 
 
-
-int validate_flag=1;
-if(validate_flag){
-    //for (int k = 0; k < timestamps; k++) {
-        for (int i = 0; i < nrows; i++) {
-          for (int j = 0; j < ncols; j++) {
-          if ((u[i][j][timesteps-1] - u2[i][j][timesteps-1])> 0.00001) {
-            printf(" Failed %d, %d %f \n",i, j,(u[i][j][timesteps-1] - u2[i][j][timesteps-1]));
-          }
-        }
-      }
-    //}
-}
-
-
-if(print_results){
-  printf("\n ------------------------\n");
-    for (int i = si; i < ei; i++) {
-      printf("\n");
-      for (int j = sc; j < ec; j++) {
-      printf(" %3.3f", u[i][j][timesteps-1]);
-    }
-  }
-}
-
-if(print_results){
-  printf("\n ------------------------\n");
-    for (int i = si; i < ei; i++) {
-      printf("\n");
-      for (int j = sc; j < ec; j++) {
-      printf(" %3.3f", u2[i][j][timesteps-1]);
-    }
-  }
-}
-
-
-		free(u);
-    free(u2);
     printf("\n");
 
 	}//rows_pow

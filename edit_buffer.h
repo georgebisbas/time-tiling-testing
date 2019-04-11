@@ -77,15 +77,15 @@ double ** * jacobi_3d(int timesteps, int nrows, int ncols, double ** * grid, int
   int xi = 0;
   int yi = 0;
   int t1 = 1;
-  int t0=0;
+  int t0 = 0;
   int x_m = 1;
   int x_M = nrows - 1;
   int y_m = 1;
   int y_M = ncols - 1;
 
   for (int titer = 0; titer < timesteps-1; titer++) {
-  t1 = titer+1 ;
-  t0 = titer ;
+    t1 = titer%2 ;
+    t0 = !t1;
 
 #pragma omp parallel for
   for (int xi = x_m; xi < x_M; xi++) {
@@ -118,8 +118,8 @@ double ** * tiled_skewed_jacobi_3d(int timesteps, int nrows, int ncols, double *
 // t interchange
       for (int titer = 0; titer < timesteps-1; titer++) {
 
-    t1 = titer + 1 ;
-    t0 = titer;
+        t1 = titer%2 ;
+        t0 = !t1;
     // parallelize for x blocks
     #pragma omp parallel for
      for (int xi = max(x_m + titer, xblk); xi < min( (x_M + titer), (xblk + x_blk_size)); xi++) {
@@ -156,8 +156,8 @@ double ** * tiled_skewed_buffer_jacobi_3d(int timesteps, int nrows, int ncols, d
 // t interchange
       for (int titer = 0; titer < timesteps-1; titer++) {
 
-    t1 = titer + 1 ;
-    t0 = titer;
+    t1 = titer%2 ;
+    t0 = !t1;
     // parallelize for x blocks
     #pragma omp parallel for
      for (int xi = max(x_m + titer, xblk); xi < min( (x_M + titer), (xblk + x_blk_size)); xi++) {
