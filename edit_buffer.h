@@ -20,32 +20,32 @@ printf("\n %sfile created",filename);
 }
 
 // Function to allocate memory for u[x][y][t]
-double*** createMatrix(int nrows, int ncols, int timestamps) {
+double*** createMatrix( int timestamps, int nrows, int ncols) {
 //  printf("\nAllocating 3d...");
   double ***matrix;
 
-  matrix = (double***)malloc(nrows*sizeof(double**));
-  for (int row = 0; row < nrows; row++) {
-    matrix[row] = (double**)malloc(ncols*sizeof(double*));
-    for (int col = 0; col < ncols; col++) {
-      matrix[row][col] = (double*)malloc(timestamps*sizeof(double));
+  matrix = (double***)malloc(timestamps*sizeof(double**));
+  for (int nt = 0; nt < timestamps; nt++) {
+    matrix[nt] = (double**)malloc(nrows*sizeof(double*));
+    for (int row = 0; row < nrows; row++) {
+      matrix[nt][row] = (double*)malloc(ncols*sizeof(double));
     }
   }
   //printf("...DONE\n");
   return matrix;
 }
 
-void initialize3(int nrows, int ncols, int timestamps, double ***A_init)
+void initialize3( int timestamps, int nrows, int ncols, double ***A_init)
 {
     // Initialize the matrix
     //printf("\nInit 3d...");
     int ti = 0;
     int xi = 0;
     int yi = 0;
-    for (xi = 0; xi < nrows; xi+=1) {
+    for (ti = 0; ti < timestamps; ti+=1) {
+      for (xi = 0; xi < nrows; xi+=1) {
         for (yi = 0; yi < ncols; yi+=1) {
-          for (ti = 0; ti < timestamps; ti+=1) {
-            A_init[xi][yi][ti] = 2*xi-yi+fabs(xi-yi);
+          A_init[ti][xi][yi] = 2*xi-yi+fabs(xi-yi);
         }
     }
   }
@@ -91,7 +91,7 @@ double ** * jacobi_3d(int timesteps, int nrows, int ncols, double ** * grid, int
   for (int xi = x_m; xi < x_M; xi++) {
     #pragma omp simd
         for (int yi = y_m; yi < y_M; yi++) {
-        grid[xi][yi][t1] = (grid[xi][yi][t0] + grid[xi - 1][yi][t0] + grid[xi + 1][yi][t0] + grid[xi][yi - 1][t0] + grid[xi][yi + 1][t0]) / 5;
+        grid[t1][xi][yi] = (grid[t0][xi][yi] + grid[t0][xi - 1][yi] + grid[t0][xi + 1][yi] + grid[t0][xi][yi - 1] + grid[t0][xi][yi + 1]) / 5;
         }
       }
   }
@@ -126,7 +126,7 @@ double ** * tiled_skewed_jacobi_3d(int timesteps, int nrows, int ncols, double *
 // simd
     #pragma omp simd
     for (int yi = y_m + titer; yi < y_M + titer; yi++) {
-  grid[xi - titer][yi - titer][t1] = (grid[xi - titer][yi - titer][t0] + grid[(xi - titer) - 1][yi - titer][t0] + grid[(xi - titer) + 1][yi - titer][t0] + grid[xi - titer][yi - titer - 1][t0] + grid[xi - titer][yi - titer + 1][t0]) / 5;
+  grid[t1][xi - titer][yi - titer] = (grid[t0][xi - titer][yi - titer] + grid[t0][(xi - titer) - 1][yi - titer] + grid[t0][(xi - titer) + 1][yi - titer] + grid[t0][xi - titer][yi - titer - 1] + grid[t0][xi - titer][yi - titer + 1]) / 5;
         }
       }
   }
@@ -164,7 +164,7 @@ double ** * tiled_skewed_buffered(int timesteps, int nrows, int ncols, double **
 // simd
     #pragma omp simd
     for (int yi = y_m + titer; yi < y_M + titer; yi++) {
-  grid[xi - titer][yi - titer][t1] = (grid[xi - titer][yi - titer][t0] + grid[(xi - titer) - 1][yi - titer][t0] + grid[(xi - titer) + 1][yi - titer][t0] + grid[xi - titer][yi - titer - 1][t0] + grid[xi - titer][yi - titer + 1][t0]) / 5;
+  grid[t1][xi - titer][yi - titer] = (grid[t0][xi - titer][yi - titer] + grid[t0][(xi - titer) - 1][yi - titer] + grid[t0][(xi - titer) + 1][yi - titer] + grid[t0][xi - titer][yi - titer - 1] + grid[t0][xi - titer][yi - titer + 1]) / 5;
         }
       }
   }

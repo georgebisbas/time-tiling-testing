@@ -54,9 +54,9 @@ int main(int argc, char **argv) {
 		double ** RESULTS;
     malloc2d(&RESULTS, 40, 10);
 
-		int validation_iters = 5;
+		int validation_iters = 10;
 		int ri=-1; int rj=0;
-		for(int rows_pow = 7 ; rows_pow < 10; rows_pow++){
+		for(int rows_pow = 11 ; rows_pow < 14; rows_pow++){
 			//for(int cols_pow = 5 ; cols_pow< 11; cols_pow++){
 //ri++;
 			for(int time_pow = 5 ; time_pow < 9; time_pow++){
@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
   			int timestamps2 = 2;    // To be removed after implementing buffering
 
 
-      if (pow( 2 ,  2*rows_pow)*2 < pow( 2 ,  32) ){
+      if (pow( 2 ,  2*rows_pow)*2 < pow( 2 ,  31) ){
       ri++;
 
 
@@ -86,15 +86,15 @@ int main(int argc, char **argv) {
 		sum_elapsedTime1 = 0 ;
 		sum_elapsedTime2 = 0;
     double *** u;
-    u = createMatrix(nrows, ncols, timestamps);
+    u = createMatrix(timestamps, nrows, ncols);
     double *** u2;
-    u2 = createMatrix(nrows, ncols, timestamps2);
+    u2 = createMatrix(timestamps2, nrows, ncols);
 
 
 for(int validation_index=0; validation_index<validation_iters;validation_index++){
 
-    initialize3(nrows, ncols, timestamps, u);
-    initialize3(nrows, ncols, timestamps2, u2);
+    initialize3( timestamps, nrows, ncols, u);
+    initialize3( timestamps2,nrows, ncols, u2);
 
     //printf("\n Starting Jacobi...");
 		gettimeofday(&t1, NULL);
@@ -121,8 +121,8 @@ for(int validation_index=0; validation_index<validation_iters;validation_index++
         //for (int k = 0; k < timestamps; k++) {
             for (int i = 0; i < nrows; i++) {
               for (int j = 0; j < ncols; j++) {
-              if ((u[i][j][1] - u2[i][j][1])> 0.00001) {
-                printf(" Failed %d, %d %f \n",i, j,(u[i][j][1] - u2[i][j][1]));
+              if ((u[1][i][j] - u2[1][i][j])> 0.00001) {
+                printf(" Failed %d, %d %f \n",i, j,(u[1][i][j] - u2[1][i][j]));
               }
             }
           }
@@ -134,7 +134,7 @@ for(int validation_index=0; validation_index<validation_iters;validation_index++
         for (int i = si; i < ei; i++) {
           printf("\n");
           for (int j = sc; j < ec; j++) {
-          printf(" %3.3f", u[i][j][1]);
+          printf(" %3.3f", u[1][i][j]);
         }
       }
     }
@@ -144,7 +144,7 @@ for(int validation_index=0; validation_index<validation_iters;validation_index++
         for (int i = si; i < ei; i++) {
           printf("\n");
           for (int j = sc; j < ec; j++) {
-          printf(" %3.3f", u2[i][j][1]);
+          printf(" %3.3f", u2[1][i][j]);
         }
       }
     }
