@@ -10,6 +10,9 @@
 #include "pmmintrin.h"
 //#include "tiled_buffer.h"
 #include "edit_buffer.h"
+#include "space_orders.h"
+#include <unistd.h>
+
 //#define min(a, b) (((a) < (b)) ? (a) : (b))
 
 int main(int argc, char **argv)
@@ -51,10 +54,10 @@ int main(int argc, char **argv)
   int validation_iters = 10; //Number of iterations
   int ri = -1;
   int rj = 0;
-  int rs = 13; 
-  int re = 14;
-  int ts = 6;
-  int te = 9;
+  int rs = 5; 
+  int re = 7;
+  int ts = 2;
+  int te = 4;
 
   for (int rows_pow = rs; rows_pow < re; rows_pow++)
   {
@@ -88,24 +91,28 @@ int main(int argc, char **argv)
         for (int validation_index = 0; validation_index < validation_iters; validation_index++)
         {
           // Set initial values
+
           initialize3(timestamps, nrows, ncols, u);
           initialize3(timestamps, nrows, ncols, u2);
+          printf("allocated");
 
-          //printf("\n Starting Jacobi...");
+          printf("\n Starting Jacobi...");
           gettimeofday(&t1, NULL);
-          u = jacobi_3d(timesteps, nrows, ncols, u, omp_opt = 0, tile_size);
+          u = so2_jacobi_3d(timesteps, nrows, ncols, u, omp_opt = 0, tile_size);
           gettimeofday(&t2, NULL);
-          //printf("... Finished \n");
+          printf("... Finished \n");
           elapsedTime1 = (double)(t2.tv_sec - t1.tv_sec) + (double)(t2.tv_usec - t1.tv_usec) / 1000000;
-          //printf("Jacobi OpenMP, Time taken by program is : %3.3f\n",elapsedTime1);
+          printf("Jacobi OpenMP, Time taken by program is : %3.3f\n",elapsedTime1);
 
-          //printf("Starting Jacobi...");
+          sleep(2);
+          printf("Starting Jacobi...");
           gettimeofday(&t1, NULL);
-          u2 = tiled_skewed_buffered(timesteps, nrows, ncols, u2, omp_opt = 0, tile_size);
+          //u2 = so2_jacobi_3d(timesteps, nrows, ncols, u2, omp_opt = 0, tile_size);
+          u2 = so2_tiled_skewed_jacobi_3d(timesteps, nrows, ncols, u2, omp_opt = 0, tile_size);
           gettimeofday(&t2, NULL);
-          //printf("... Finished \n");
+          printf("... Finished \n");
           elapsedTime2 = (double)(t2.tv_sec - t1.tv_sec) + (double)(t2.tv_usec - t1.tv_usec) / 1000000;
-          //printf("Jacobi skewed, Time taken by program is : %3.3f\n",elapsedTime2);
+          printf("Jacobi skewed, Time taken by program is : %3.3f\n",elapsedTime2);
 
           printf(" Speedup from skeweing is : %3.3f\n", elapsedTime1 / elapsedTime2);
           sum_elapsedTime1 += elapsedTime1;
