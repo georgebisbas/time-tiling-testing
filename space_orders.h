@@ -28,7 +28,8 @@ double ***so2_jacobi_3d(int timesteps, int nrows, int ncols, double ***grid, int
 #pragma omp simd
       for (int yi = y_m; yi < y_M; yi++)
       {
-        grid[t1][xi][yi] = (grid[t0][xi][yi] + grid[t0][xi - 1][yi] + grid[t0][xi + 1][yi] + grid[t0][xi][yi - 1] + grid[t0][xi][yi + 1]+ grid[t0][xi - 2][yi] + grid[t0][xi + 2][yi] + grid[t0][xi][yi - 2] + grid[t0][xi][yi + 2]) / 5;      }
+        grid[t1][xi][yi] = (grid[t0][xi][yi] + grid[t0][xi - 1][yi] + grid[t0][xi + 1][yi] + grid[t0][xi][yi - 1] + grid[t0][xi][yi + 1]+
+                                               grid[t0][xi - 2][yi] + grid[t0][xi + 2][yi] + grid[t0][xi][yi - 2] + grid[t0][xi][yi + 2]) / 5; }
     }
   }
   return grid;
@@ -93,26 +94,24 @@ double ***so2_tiled_skewed_jacobi_3d(int timesteps, int nrows, int ncols, double
   int x_blk_size = tile_size;
 
   // x blocking
-  for (int xblk = x_m; xblk < x_M + timesteps - 2; xblk += x_blk_size)
+  for (int xblk = x_m; xblk < x_M + timesteps - 1; xblk += x_blk_size)
   {
     // t interchange
-    for (int titer = 0; titer < timesteps - 2; titer++)
+    for (int titer = 0; titer < timesteps - 1; titer++)
     {
       t1 = titer % 2;
       t0 = !t1;
 // parallelize for x blocks
-//#pragma omp parallel for
+#pragma omp parallel for
       for (int xi = max(x_m + titer, xblk); xi < min((x_M + titer), (xblk + x_blk_size)); xi++)
       {
         // simd
-//#pragma omp simd
+#pragma omp simd
         for (int yi = y_m + titer; yi < y_M + titer; yi++)
         {
-          printf(" Speedup from skeweing is : u[%d][%d][%d]\n", titer,xi,yi);
+          //printf(" Speedup from skeweing is : u[%d][%d][%d]\n", titer,xi,yi);
 
-          grid[t1][xi - titer][yi - titer] = (grid[t0][xi - titer][yi - titer] + grid[t0][(xi - titer) - 1][yi - titer] + grid[t0][(xi - titer) + 1][yi - titer] + grid[t0][xi - titer][yi - titer - 1] + grid[t0][xi - titer][yi - titer + 1]+
-            grid[t0][xi - 2][yi] + grid[t0][xi + 2][yi] + grid[t0][xi][yi -2] + grid[t0][xi][yi + 2]) / 5;
-        }
+          grid[t1][xi - titer][yi - titer] = (grid[t0][xi - titer][yi - titer] + grid[t0][(xi - titer) - 1][yi - titer] + grid[t0][(xi - titer) + 1][yi - titer] + grid[t0][xi - titer][yi - titer - 1] + grid[t0][xi - titer][yi - titer + 1] + grid[t0][(xi - titer) - 2][yi - titer] + grid[t0][(xi - titer) + 2][yi - titer] + grid[t0][xi - titer][yi - titer - 2] + grid[t0][xi - titer][yi - titer + 2])/ 5;}
       }
     }
   }

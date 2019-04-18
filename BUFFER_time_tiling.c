@@ -22,9 +22,9 @@ int main(int argc, char **argv)
   //int timesteps = atoi(argv[3]); //Number of timsteps
   int tile_size = atoi(argv[1]);   // Size of tile (space and time)
   int num_threads = atoi(argv[2]); // Size of tile (space and time)
-  
+
   // Print a segment of the calculations and define starting and ending indexes
-  int print_results = 0; 
+  int print_results = 0;
   int si = 10;
   int ei = 15;
   int sc = 10;
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
   _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 
   //printf("Problem setup is \nnrows: %d\nncols: %d\nTimesteps: %d\nTimestamps: %d\n",nrows, ncols, timesteps, timestamps);
-  
+
   //Define a 2d matrix to store the results
   double **RESULTS;
   malloc2d(&RESULTS, 40, 10);
@@ -54,8 +54,8 @@ int main(int argc, char **argv)
   int validation_iters = 10; //Number of iterations
   int ri = -1;
   int rj = 0;
-  int rs = 5; 
-  int re = 7;
+  int rs = 8;
+  int re = 10;
   int ts = 2;
   int te = 4;
 
@@ -94,25 +94,25 @@ int main(int argc, char **argv)
 
           initialize3(timestamps, nrows, ncols, u);
           initialize3(timestamps, nrows, ncols, u2);
-          printf("allocated");
+          //printf("allocated");
 
-          printf("\n Starting Jacobi...");
+          //printf("\n Starting Jacobi...");
           gettimeofday(&t1, NULL);
           u = so2_jacobi_3d(timesteps, nrows, ncols, u, omp_opt = 0, tile_size);
           gettimeofday(&t2, NULL);
-          printf("... Finished \n");
+          //printf("... Finished \n");
           elapsedTime1 = (double)(t2.tv_sec - t1.tv_sec) + (double)(t2.tv_usec - t1.tv_usec) / 1000000;
-          printf("Jacobi OpenMP, Time taken by program is : %3.3f\n",elapsedTime1);
+          //printf("Jacobi OpenMP, Time taken by program is : %3.3f\n",elapsedTime1);
 
-          sleep(2);
-          printf("Starting Jacobi...");
+          //sleep(2);
+          //printf("Starting Jacobi...");
           gettimeofday(&t1, NULL);
           //u2 = so2_jacobi_3d(timesteps, nrows, ncols, u2, omp_opt = 0, tile_size);
           u2 = so2_tiled_skewed_jacobi_3d(timesteps, nrows, ncols, u2, omp_opt = 0, tile_size);
           gettimeofday(&t2, NULL);
-          printf("... Finished \n");
+          //printf("... Finished \n");
           elapsedTime2 = (double)(t2.tv_sec - t1.tv_sec) + (double)(t2.tv_usec - t1.tv_usec) / 1000000;
-          printf("Jacobi skewed, Time taken by program is : %3.3f\n",elapsedTime2);
+          //printf("Jacobi skewed, Time taken by program is : %3.3f\n",elapsedTime2);
 
           printf(" Speedup from skeweing is : %3.3f\n", elapsedTime1 / elapsedTime2);
           sum_elapsedTime1 += elapsedTime1;
@@ -191,7 +191,7 @@ int main(int argc, char **argv)
   char str[100] = "Results";
   // Uncomment to edit the name of the file.
   // printf("\n Enter the filename :"); gets(str);
-  
+
 
   create_results_csv(str, RESULTS, 6, 20);
   return 0;
