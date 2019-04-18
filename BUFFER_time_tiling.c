@@ -25,10 +25,10 @@ int main(int argc, char **argv)
 
   // Print a segment of the calculations and define starting and ending indexes
   int print_results = 0;
-  int si = 10;
-  int ei = 15;
-  int sc = 10;
-  int ec = 15;
+  int si = 1;
+  int ei = 7;
+  int sc = 1;
+  int ec = 7;
 
   //Define sources and receivers numbers
   int nsrc = 1;   // Number of sources
@@ -51,13 +51,13 @@ int main(int argc, char **argv)
   double **RESULTS;
   malloc2d(&RESULTS, 40, 10);
 
-  int validation_iters = 10; //Number of iterations
+  int validation_iters = 5; //Number of iterations
   int ri = -1;
   int rj = 0;
-  int rs = 8;
-  int re = 10;
-  int ts = 2;
-  int te = 4;
+  int rs = atoi(argv[3]);
+  int re = rs + 3;
+  int ts = atoi(argv[4]);
+  int te = ts + 3;
 
   for (int rows_pow = rs; rows_pow < re; rows_pow++)
   {
@@ -114,7 +114,7 @@ int main(int argc, char **argv)
           elapsedTime2 = (double)(t2.tv_sec - t1.tv_sec) + (double)(t2.tv_usec - t1.tv_usec) / 1000000;
           //printf("Jacobi skewed, Time taken by program is : %3.3f\n",elapsedTime2);
 
-          printf(" Speedup from skeweing is : %3.3f\n", elapsedTime1 / elapsedTime2);
+          printf("Run : %d Speedup from skewing is : %3.3f\n", validation_index, elapsedTime1 / elapsedTime2);
           sum_elapsedTime1 += elapsedTime1;
           sum_elapsedTime2 += elapsedTime2;
 
@@ -164,7 +164,7 @@ int main(int argc, char **argv)
         RESULTS[ri][5] = sum_elapsedTime1 / sum_elapsedTime2;
 
         printf("Problem setup is \nnrows: %d\nncols: %d\nTimesteps: %d\nTimestamps: %d\n", nrows, ncols, timesteps, timestamps);
-        printf(" Average speedup from skeweing is : %3.3f\n", sum_elapsedTime1 / sum_elapsedTime2);
+        printf(" Average speedup from skewing is : %3.3f\n", sum_elapsedTime1 / sum_elapsedTime2);
 
         free(u);
         free(u2);
@@ -178,7 +178,7 @@ int main(int argc, char **argv)
   if (1)
   {
     printf("\n ------------------------\n");
-    for (int i = 0; i < 20; i++)
+    for (int i = 0; i < (re-rs + te-ts); i++)
     {
       printf("\n");
       for (int j = 0; j < 6; j++)
