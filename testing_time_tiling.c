@@ -9,7 +9,8 @@
 #include "xmmintrin.h"
 #include "pmmintrin.h"
 #include "space_orders_1.h"
-#include "space_orders_1.h"
+#include "space_orders_2.h"
+#include "auxiliary.h"
 #include <unistd.h>
 
 //#define min(a, b) (((a) < (b)) ? (a) : (b))
