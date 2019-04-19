@@ -1,10 +1,10 @@
-all: BUFFER_time_tiling
+all: testing_time_tiling
 
 CC = gcc #icc
 DEPS = tile_auxiliary.h
 
 
-BUFFER_time_tiling: BUFFER_time_tiling.c
-	$(CC) -O3 -g -ffast-math -w -fopenmp BUFFER_time_tiling.c -lm
+testing_time_tiling: testing_time_tiling.c
+	$(CC) -O3 -g -ffast-math -w -fopenmp testing_time_tiling.c -lm
 clean:
-	rm -f BUFFER_time_tiling *.o
+	rm -f testing_time_tiling *.o
